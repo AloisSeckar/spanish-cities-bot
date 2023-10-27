@@ -25,18 +25,18 @@ public class SpanishCitiesBot {
             System.out.println("LOADING DATA...");
             var gson = new Gson();
 
+            // read `cities.json` file (cities data to update)
+            var cityDataPath = "c:\\Temp\\cities.json";
+            var cityDataReader = new JsonReader(new FileReader(cityDataPath));
+            CityData[] cityDataList = gson.fromJson(cityDataReader, CityData[].class);
+            System.out.println(cityDataList.length + " CityData items loaded");
+            System.out.println();
+
             // read `output.json` file (image data to read)
             var imageDataPath = "c:\\Programming\\Git\\wiki-image-crawler\\target\\output.json";
             var imageDataReader = new JsonReader(new FileReader(imageDataPath));
             ImageData[] imageDataList = gson.fromJson(imageDataReader, ImageData[].class);
             System.out.println(imageDataList.length + " ImageData items loaded");
-
-            // read `cities.json` file (cities data to update)
-            var citiesDataPath = "c:\\Temp\\cities.json";
-            var citiesDataReader = new JsonReader(new FileReader(citiesDataPath));
-            CitiesData[] citiesDataList = gson.fromJson(citiesDataReader, CitiesData[].class);
-            System.out.println(citiesDataList.length + " CitiesData items loaded");
-            System.out.println();
 
             // cycle through imageData
             // try to find relevant record in "cities"
@@ -91,7 +91,7 @@ public class SpanishCitiesBot {
     }
 
     @Data
-    private static class CitiesData {
+    private static class CityData {
         private String code;
         private String name;
         private String code_autonomy;
@@ -101,7 +101,7 @@ public class SpanishCitiesBot {
 
         @Override
         public String toString() {
-            return "CitiesData{" +
+            return "cityData{" +
                     "code='" + code + '\'' +
                     ", name='" + name + '\'' +
                     ", code_autonomy='" + code_autonomy + '\'' +
