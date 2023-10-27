@@ -3,6 +3,7 @@ package cz.aloisseckar;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import java.io.FileReader;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import lombok.Data;
@@ -22,6 +23,11 @@ public class SpanishCitiesBot {
     public static void main(String[] args) {
 
         try {
+            // we need province code (to avoid confusing cities with same name)
+            var in = new Scanner(System.in);
+            System.out.println("Enter the code of province:");
+            var province = in.nextLine();
+
             System.out.println("LOADING DATA...");
             var gson = new Gson();
 
@@ -30,6 +36,9 @@ public class SpanishCitiesBot {
             var cityDataReader = new JsonReader(new FileReader(cityDataPath));
             CityData[] cityDataList = gson.fromJson(cityDataReader, CityData[].class);
             System.out.println(cityDataList.length + " CityData items loaded");
+            System.out.println("Filtering by province: " + province);
+            var filteredCityDataList = Arrays.stream(cityDataList).filter(data -> data.code_province.equals(province)).toList();
+            System.out.println(filteredCityDataList.size() + " CityData items filtered");
             System.out.println();
 
             // read `output.json` file (image data to read)
@@ -45,25 +54,36 @@ public class SpanishCitiesBot {
             System.out.println("PROCESSING DATA...");
             System.out.println();
             for (var data : imageDataList) {
+                System.out.println("----");
                 var rawName = data.getName();
                 // exclude invalid names (not .svg, with english names or with brackets)
                 if (!rawName.endsWith(".svg") || rawName.contains("Coat of Arms") || rawName.contains("(")) {
-                    System.out.println("`" + rawName + "` marked as not relevant => skipping...");
+                    System.out.println("`" + rawName + "` - marked as not relevant => skipping...");
                     continue;
                 }
                 // sanitize invalid characters (semicolons or apostrophes)
                 var checkedName = rawName.replaceAll(";", " ").replaceAll("’", " ");
                 // extract part from last space to `.svg` suffix - should be (a part of) city name
-                var cityName = checkedName.substring(checkedName.lastIndexOf(" "), checkedName.length() - 4);
+                var cityName = checkedName.substring(checkedName.lastIndexOf(" ") + 1, checkedName.length() - 4);
                 // exclude values with numbers (like "Escut d'Algorfa-2.svg")
                 var m = Pattern.compile("\\d+").matcher(cityName);
                 if (m.find()) {
-                    System.out.println("`" + rawName + "` marked as not relevant => skipping...");
+                    System.out.println("`" + rawName + "` - marked as not relevant => skipping...");
                     continue;
                 }
                 // yay, relevant name!
                 System.out.println(cityName);
+
+                // try to find the city by extracted name
+                var city = filteredCityDataList.stream().filter(cityData -> cityData.getName().contains(cityName)).findFirst();
+                if (!city.isPresent()) {
+                    System.out.println("`" + rawName + "` - matching city not found => skipping...");
+                    continue;
+                }
+                // yay, relevant city!
+                System.out.println(city);
             }
+            System.out.println("----");
 
             System.out.println("FINISHED");
 
