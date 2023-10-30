@@ -72,16 +72,32 @@ public class SpanishCitiesBot {
                     continue;
                 }
                 // yay, relevant name!
-                System.out.println(cityName);
 
                 // try to find the city by extracted name
                 var city = filteredCityDataList.stream().filter(cityData -> cityData.getName().contains(cityName)).findFirst();
-                if (!city.isPresent()) {
+                if (city.isEmpty()) {
                     System.out.println("`" + rawName + "` - matching city not found => skipping...");
                     continue;
                 }
                 // yay, relevant city!
-                System.out.println(city);
+
+                // decide whether to update flag or coat_of_arms
+                var cityData = city.get();
+                var flag = data.getFlag();
+                var coatOfArms = data.getCoat_of_arms();
+                if (flag != null) {
+                    if (cityData.getFlag() != null) {
+                        System.out.println("`" + rawName + "` - flag already filled => skipping...");
+                        continue;
+                    }
+                    city.get().setFlag(flag);
+                } else {
+                    if (cityData.getCoat_of_arms() != null) {
+                        System.out.println("`" + rawName + "` - coat_of_arms already filled => skipping...");
+                        continue;
+                    }
+                    city.get().setCoat_of_arms(coatOfArms);
+                }
             }
             System.out.println("----");
 
