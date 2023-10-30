@@ -5,10 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import com.google.gson.stream.JsonWriter;
 import lombok.Data;
 
 /**
@@ -36,7 +35,7 @@ public class SpanishCitiesBot {
 
             // read `cities.json` file (cities data to update)
             var cityDataPath = "c:\\Temp\\cities.json";
-            var cityDataReader = new JsonReader(new FileReader(cityDataPath));
+            var cityDataReader = new JsonReader(new FileReader(cityDataPath, StandardCharsets.UTF_8));
             CityData[] cityDataList;
             try {
                 cityDataList = gson.fromJson(cityDataReader, CityData[].class);
@@ -116,10 +115,11 @@ public class SpanishCitiesBot {
 
             // write altered cities data into file
             var cityDataOutputPath = "c:\\Temp\\cities-out.json";
-            try (final var fileWriter = new FileWriter(cityDataOutputPath)) {
+            try (final var fileWriter = new FileWriter(cityDataOutputPath, StandardCharsets.UTF_8)) {
                 new GsonBuilder()
                         .setPrettyPrinting()    // include indentation
                         .serializeNulls()       // do not omit NULLs
+                        .disableHtmlEscaping()
                         .create()
                         .toJson(cityDataList, fileWriter);
             }
