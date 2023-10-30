@@ -1,11 +1,14 @@
 package cz.aloisseckar;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import com.google.gson.stream.JsonWriter;
 import lombok.Data;
 
 /**
@@ -110,6 +113,16 @@ public class SpanishCitiesBot {
                 }
             }
             System.out.println("----");
+
+            // write altered cities data into file
+            var cityDataOutputPath = "c:\\Temp\\cities-out.json";
+            try (final var fileWriter = new FileWriter(cityDataOutputPath)) {
+                new GsonBuilder()
+                        .setPrettyPrinting()    // include indentation
+                        .serializeNulls()       // do not omit NULLs
+                        .create()
+                        .toJson(cityDataList, fileWriter);
+            }
 
             System.out.println("FINISHED");
 
