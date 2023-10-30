@@ -34,7 +34,12 @@ public class SpanishCitiesBot {
             // read `cities.json` file (cities data to update)
             var cityDataPath = "c:\\Temp\\cities.json";
             var cityDataReader = new JsonReader(new FileReader(cityDataPath));
-            CityData[] cityDataList = gson.fromJson(cityDataReader, CityData[].class);
+            CityData[] cityDataList;
+            try {
+                cityDataList = gson.fromJson(cityDataReader, CityData[].class);
+            } finally {
+                cityDataReader.close();
+            }
             System.out.println(cityDataList.length + " CityData items loaded");
             System.out.println("Filtering by province: " + province);
             var filteredCityDataList = Arrays.stream(cityDataList).filter(data -> data.code_province.equals(province)).toList();
@@ -44,7 +49,12 @@ public class SpanishCitiesBot {
             // read `output.json` file (image data to read)
             var imageDataPath = "c:\\Programming\\Git\\wiki-image-crawler\\target\\output.json";
             var imageDataReader = new JsonReader(new FileReader(imageDataPath));
-            ImageData[] imageDataList = gson.fromJson(imageDataReader, ImageData[].class);
+            ImageData[] imageDataList;
+            try {
+                imageDataList = gson.fromJson(imageDataReader, ImageData[].class);
+            } finally {
+                imageDataReader.close();
+            }
             System.out.println(imageDataList.length + " ImageData items loaded");
 
             // cycle through imageData
