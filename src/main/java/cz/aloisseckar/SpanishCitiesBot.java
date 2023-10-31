@@ -67,14 +67,14 @@ public class SpanishCitiesBot {
             // try to find relevant record in "cities"
             // if possible, update value of either "coat_of_arms" or "flag"
             // if not possible, output the problem for manual checking
+            System.out.println();
             System.out.println("PROCESSING DATA...");
             System.out.println();
             for (var data : imageDataList) {
-                System.out.println("----");
                 var rawName = data.getName();
                 // exclude invalid names (not .svg, with english names or with brackets)
                 if (!rawName.endsWith(".svg") || rawName.contains("Coat of Arms") || rawName.contains("(")) {
-                    System.out.println("`" + rawName + "` - marked as not relevant => skipping...");
+                    System.out.println("`" + rawName + "` - marked as not relevant => skipped");
                     continue;
                 }
                 // sanitize invalid characters (semicolons or apostrophes)
@@ -84,7 +84,7 @@ public class SpanishCitiesBot {
                 // exclude values with numbers (like "Escut d'Algorfa-2.svg")
                 var m = Pattern.compile("\\d+").matcher(cityName);
                 if (m.find()) {
-                    System.out.println("`" + rawName + "` - marked as not relevant => skipping...");
+                    System.out.println("`" + rawName + "` - marked as not relevant => skipped");
                     continue;
                 }
                 // yay, relevant name!
@@ -92,7 +92,7 @@ public class SpanishCitiesBot {
                 // try to find the city by extracted name
                 var city = filteredCityDataList.stream().filter(cityData -> cityData.getName().contains(cityName)).findFirst();
                 if (city.isEmpty()) {
-                    System.out.println("`" + rawName + "` - matching city not found => skipping...");
+                    System.out.println("`" + rawName + "` - matching city not found => skipped");
                     continue;
                 }
                 // yay, relevant city!
@@ -104,30 +104,31 @@ public class SpanishCitiesBot {
                 if (flag != null) {
                     // check if the file is actually used on spanish wikipedia
                     if (!checkImageUsage(flag)) {
-                        System.out.println("`" + rawName + "` - image not used => skipping...");
+                        System.out.println("`" + rawName + "` - image not used => skipped");
                         continue;
                     }
                     // do not overwrite existing entry
                     if (cityData.getFlag() != null) {
-                        System.out.println("`" + rawName + "` - flag already filled => skipping...");
+                        System.out.println("`" + rawName + "` - flag already filled => skipped");
                         continue;
                     }
                     city.get().setFlag(flag);
+                    System.out.println("`" + rawName + "` - added as `flag` to " + city.get().getName());
                 } else {
                     // check if the file is actually used on spanish wikipedia
                     if (!checkImageUsage(coatOfArms)) {
-                        System.out.println("`" + rawName + "` - image not used => skipping...");
+                        System.out.println("`" + rawName + "` - image not used => skipped");
                         continue;
                     }
                     // do not overwrite existing entry
                     if (cityData.getCoat_of_arms() != null) {
-                        System.out.println("`" + rawName + "` - coat_of_arms already filled => skipping...");
+                        System.out.println("`" + rawName + "` - coat_of_arms already filled => skipped");
                         continue;
                     }
                     city.get().setCoat_of_arms(coatOfArms);
+                    System.out.println("`" + rawName + "` - added as `coat_of_arms` to " + city.get().getName());
                 }
             }
-            System.out.println("----");
 
             // write altered cities data into file
             var cityDataOutputPath = "c:\\Temp\\cities-out.json";
@@ -139,9 +140,7 @@ public class SpanishCitiesBot {
                         .create()
                         .toJson(cityDataList, fileWriter);
             }
-
-            System.out.println("FINISHED");
-
+            
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace(System.out);
