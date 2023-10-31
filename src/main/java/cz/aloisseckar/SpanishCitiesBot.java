@@ -55,12 +55,13 @@ public class SpanishCitiesBot {
             try (var flagsDataReader = new JsonReader(new FileReader(flagsDataPath))) {
                 imageDataList.addAll(Arrays.asList(gson.fromJson(flagsDataReader, ImageData[].class)));
             }
-            System.out.println(imageDataList.size() + " flags loaded");
+            var flags = imageDataList.size();
+            System.out.println(flags + " flags loaded");
             var coaDataPath = "c:\\Temp\\coa.json";
             try (var coaDataReader = new JsonReader(new FileReader(coaDataPath))) {
                 imageDataList.addAll(Arrays.asList(gson.fromJson(coaDataReader, ImageData[].class)));
             }
-            System.out.println(imageDataList.size() + " coat_of_arms loaded");
+            System.out.println((imageDataList.size() - flags) + " coat_of_arms loaded");
 
             // cycle through all imageData
             // try to find relevant record in "cities"
@@ -80,7 +81,8 @@ public class SpanishCitiesBot {
                 var checkedName = rawName
                         .replaceAll(";", " ")
                         .replaceAll("’", " ")
-                        .replaceAll(" Spain", "")           // names sometimes end with "_Spain"
+                        .replaceAll(" Spain\\.", "")           // names sometimes end with "_Spain"
+                        .replaceAll(" flag\\.", "")           // names sometimes end with "_flag"
                         .replaceAll("\\s\\(.*\\)", "");     // there are sometimes province in brackets
                 // extract part from last space to `.svg` suffix - should be (a part of) city name
                 var cityName = checkedName.substring(checkedName.lastIndexOf(" ") + 1, checkedName.length() - 4);
