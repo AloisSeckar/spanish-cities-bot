@@ -37,33 +37,32 @@ public class SpanishCitiesBot {
             System.out.println("LOADING DATA...");
             var gson = new Gson();
 
-            // read `cities.json` file (cities data to update)
+            // read `cities.json` file with data to update
             var cityDataPath = "c:\\Temp\\cities.json";
-            var cityDataReader = new JsonReader(new FileReader(cityDataPath, StandardCharsets.UTF_8));
-            CityData[] cityDataList;
-            try {
-                cityDataList = gson.fromJson(cityDataReader, CityData[].class);
-            } finally {
-                cityDataReader.close();
+            ArrayList<CityData> cityDataList = new ArrayList<>();
+            try (var cityDataReader = new JsonReader(new FileReader(cityDataPath, StandardCharsets.UTF_8))) {
+                cityDataList.addAll(Arrays.asList(gson.fromJson(cityDataReader, CityData[].class)));
             }
-            System.out.println(cityDataList.length + " CityData items loaded");
+            System.out.println(cityDataList.size() + " CityData items loaded");
             System.out.println("Filtering by province: " + province);
-            var filteredCityDataList = Arrays.stream(cityDataList).filter(data -> data.code_province.equals(province)).toList();
+            var filteredCityDataList = cityDataList.stream().filter(data -> data.code_province.equals(province)).toList();
             System.out.println(filteredCityDataList.size() + " CityData items filtered");
             System.out.println();
 
-            // read `output.json` file (image data to read)
-            var imageDataPath = "c:\\Programming\\Git\\wiki-image-crawler\\target\\output.json";
-            var imageDataReader = new JsonReader(new FileReader(imageDataPath));
-            ImageData[] imageDataList;
-            try {
-                imageDataList = gson.fromJson(imageDataReader, ImageData[].class);
-            } finally {
-                imageDataReader.close();
+            // read crawled image data to process
+            ArrayList<ImageData> imageDataList = new ArrayList<>();
+            var flagsDataPath = "c:\\Temp\\flags.json";
+            try (var flagsDataReader = new JsonReader(new FileReader(flagsDataPath))) {
+                imageDataList.addAll(Arrays.asList(gson.fromJson(flagsDataReader, ImageData[].class)));
             }
-            System.out.println(imageDataList.length + " ImageData items loaded");
+            System.out.println(imageDataList.size() + " flags loaded");
+            var coaDataPath = "c:\\Temp\\coa.json";
+            try (var coaDataReader = new JsonReader(new FileReader(coaDataPath))) {
+                imageDataList.addAll(Arrays.asList(gson.fromJson(coaDataReader, ImageData[].class)));
+            }
+            System.out.println(imageDataList.size() + " coat_of_arms loaded");
 
-            // cycle through imageData
+            // cycle through all imageData
             // try to find relevant record in "cities"
             // if possible, update value of either "coat_of_arms" or "flag"
             // if not possible, output the problem for manual checking
@@ -140,7 +139,7 @@ public class SpanishCitiesBot {
                         .create()
                         .toJson(cityDataList, fileWriter);
             }
-            
+
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace(System.out);
