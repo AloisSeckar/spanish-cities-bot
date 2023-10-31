@@ -5,6 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -98,12 +102,24 @@ public class SpanishCitiesBot {
                 var flag = data.getFlag();
                 var coatOfArms = data.getCoat_of_arms();
                 if (flag != null) {
+                    // check if the file is actually used on spanish wikipedia
+                    if (!checkImageUsage(flag)) {
+                        System.out.println("`" + rawName + "` - image not used => skipping...");
+                        continue;
+                    }
+                    // do not overwrite existing entry
                     if (cityData.getFlag() != null) {
                         System.out.println("`" + rawName + "` - flag already filled => skipping...");
                         continue;
                     }
                     city.get().setFlag(flag);
                 } else {
+                    // check if the file is actually used on spanish wikipedia
+                    if (!checkImageUsage(coatOfArms)) {
+                        System.out.println("`" + rawName + "` - image not used => skipping...");
+                        continue;
+                    }
+                    // do not overwrite existing entry
                     if (cityData.getCoat_of_arms() != null) {
                         System.out.println("`" + rawName + "` - coat_of_arms already filled => skipping...");
                         continue;
@@ -131,6 +147,21 @@ public class SpanishCitiesBot {
             ex.printStackTrace(System.out);
         }
 
+    }
+
+    private static boolean checkImageUsage(String imageName) {
+        try (HttpClient client = HttpClient.newHttpClient()) {
+            var fileName = imageName.substring(imageName.lastIndexOf("/") + 1);
+            var apiUrl = "https://es.wikipedia.org/w/api.php?action=query&generator=fileusage&titles=File:" + fileName + "&format=json";
+            var apiRequest = HttpRequest.newBuilder().uri(URI.create(apiUrl)).build();
+            var apiResponse = client.send(apiRequest, HttpResponse.BodyHandlers.ofString());
+            // if image is used, there is a "query" object with a "pages" object in JSON
+            // if image is not used, there is only "batchcomplete" element
+            return apiResponse.body().contains("query") && apiResponse.body().contains("pages");
+        } catch (Exception ex) {
+            ex.printStackTrace(System.err);
+        }
+        return false;
     }
 
     @Data
