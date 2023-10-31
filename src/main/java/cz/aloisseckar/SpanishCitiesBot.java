@@ -71,13 +71,17 @@ public class SpanishCitiesBot {
             System.out.println();
             for (var data : imageDataList) {
                 var rawName = data.getName();
-                // exclude invalid names (not .svg, with english names or with brackets)
-                if (!rawName.endsWith(".svg") || rawName.contains("Coat of Arms") || rawName.contains("(")) {
+                // exclude invalid names (not .svg)
+                if (!rawName.endsWith(".svg")) {
                     System.out.println("`" + rawName + "` - marked as not relevant => skipped");
                     continue;
                 }
-                // sanitize invalid characters (semicolons or apostrophes)
-                var checkedName = rawName.replaceAll(";", " ").replaceAll("’", " ");
+                // sanitize invalid characters (semicolons or apostrophes) + some identified patterns
+                var checkedName = rawName
+                        .replaceAll(";", " ")
+                        .replaceAll("’", " ")
+                        .replaceAll(" Spain", "")           // names sometimes end with "_Spain"
+                        .replaceAll("\\s\\(.*\\)", "");     // there are sometimes province in brackets
                 // extract part from last space to `.svg` suffix - should be (a part of) city name
                 var cityName = checkedName.substring(checkedName.lastIndexOf(" ") + 1, checkedName.length() - 4);
                 // exclude values with numbers (like "Escut d'Algorfa-2.svg")
@@ -111,6 +115,7 @@ public class SpanishCitiesBot {
                         System.out.println("`" + rawName + "` - flag already filled => skipped");
                         continue;
                     }
+                    // yay, a flag to add!
                     city.get().setFlag(flag);
                     System.out.println("`" + rawName + "` - added as `flag` to " + city.get().getName());
                 } else {
@@ -124,6 +129,7 @@ public class SpanishCitiesBot {
                         System.out.println("`" + rawName + "` - coat_of_arms already filled => skipped");
                         continue;
                     }
+                    // yay, a coat_of_arms to add!
                     city.get().setCoat_of_arms(coatOfArms);
                     System.out.println("`" + rawName + "` - added as `coat_of_arms` to " + city.get().getName());
                 }
