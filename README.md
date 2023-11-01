@@ -6,9 +6,9 @@ It takes `json` crawled by [wiki-image-crawler](https://github.com/AloisSeckar/w
 
 ## How to use?
 1. Pick a [Spanish province](https://es.wikipedia.org/wiki/Provincia_(Espa%C3%B1a))
-2. Run [wiki-image-crawler](https://github.com/AloisSeckar/wiki-image-crawler) on [flag category page](https://commons.wikimedia.org/wiki/Category:SVG_flags_of_municipalities_of_Spain_by_province) of selected province to produce `flags` file
-3. Run [wiki-image-crawler](https://github.com/AloisSeckar/wiki-image-crawler) on [coat of arms category page](https://commons.wikimedia.org/wiki/Category:SVG_coats_of_arms_of_municipalities_of_Spain_by_province) of selected province to produce `coat-of-arms` file
-4. Configure **spanish-cities-bot** to read from those files and to write into correct `cities` file (preferably directly in [spanish-cities](https://github.com/ByMykel/spanish-cities) project directory)
+2. Run [wiki-image-crawler](https://github.com/AloisSeckar/wiki-image-crawler) on [flag category page](https://commons.wikimedia.org/wiki/Category:SVG_flags_of_municipalities_of_Spain_by_province) of selected province to produce `flags` file (you can name the output as you see fit)
+3. Run [wiki-image-crawler](https://github.com/AloisSeckar/wiki-image-crawler) on [coat of arms category page](https://commons.wikimedia.org/wiki/Category:SVG_coats_of_arms_of_municipalities_of_Spain_by_province) of selected province to produce `coat-of-arms` file (you can name the output as you see fit)
+4. Configure **spanish-cities-bot** (`bot.config` file in project directory) to read from those files and to write into correct `cities` file (preferably directly in [spanish-cities](https://github.com/ByMykel/spanish-cities) project directory)
 7. Sync fork of [spanish-cities](https://github.com/ByMykel/spanish-cities) to get the latest source data
 8. Run **spanish-cities-bot** to apply `flags` and `coat-of-arms` files on `cities` data
 9. Open updated `cities.json` in IDE with highlighted changes
