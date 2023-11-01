@@ -3,6 +3,8 @@ package cz.aloisseckar;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
+
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.net.URI;
@@ -37,10 +39,15 @@ public class SpanishCitiesBot {
             System.out.println("LOADING DATA...");
             var gson = new Gson();
 
+            Properties prop = new Properties();
+            String fileName = "bot.config";
+            try (FileInputStream fis = new FileInputStream(fileName)) {
+                prop.load(fis);
+            }
+
             // read `cities.json` file with data to update
-            var cityDataPath = "c:\\Temp\\cities.json";
             ArrayList<CityData> cityDataList = new ArrayList<>();
-            try (var cityDataReader = new JsonReader(new FileReader(cityDataPath, StandardCharsets.UTF_8))) {
+            try (var cityDataReader = new JsonReader(new FileReader(prop.getProperty("cityData"), StandardCharsets.UTF_8))) {
                 cityDataList.addAll(Arrays.asList(gson.fromJson(cityDataReader, CityData[].class)));
             }
             System.out.println(cityDataList.size() + " CityData items loaded");
@@ -51,14 +58,12 @@ public class SpanishCitiesBot {
 
             // read crawled image data to process
             ArrayList<ImageData> imageDataList = new ArrayList<>();
-            var flagsDataPath = "c:\\Temp\\flags.json";
-            try (var flagsDataReader = new JsonReader(new FileReader(flagsDataPath))) {
+            try (var flagsDataReader = new JsonReader(new FileReader(prop.getProperty("flagData")))) {
                 imageDataList.addAll(Arrays.asList(gson.fromJson(flagsDataReader, ImageData[].class)));
             }
             var flags = imageDataList.size();
             System.out.println(flags + " flags loaded");
-            var coaDataPath = "c:\\Temp\\coa.json";
-            try (var coaDataReader = new JsonReader(new FileReader(coaDataPath))) {
+            try (var coaDataReader = new JsonReader(new FileReader(prop.getProperty("coaData")))) {
                 imageDataList.addAll(Arrays.asList(gson.fromJson(coaDataReader, ImageData[].class)));
             }
             System.out.println((imageDataList.size() - flags) + " coat_of_arms loaded");
