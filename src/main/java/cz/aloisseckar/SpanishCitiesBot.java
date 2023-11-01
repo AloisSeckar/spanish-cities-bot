@@ -143,8 +143,7 @@ public class SpanishCitiesBot {
             }
 
             // write altered cities data into file
-            var cityDataOutputPath = "c:\\Temp\\cities-out.json";
-            try (final var fileWriter = new FileWriter(cityDataOutputPath, StandardCharsets.UTF_8)) {
+            try (final var fileWriter = new FileWriter(prop.getProperty("cityOutput"), StandardCharsets.UTF_8)) {
                 new GsonBuilder()
                         .setPrettyPrinting()    // include indentation
                         .serializeNulls()       // do not omit NULLs
